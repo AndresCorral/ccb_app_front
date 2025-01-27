@@ -72,16 +72,19 @@ export const login = async (credentials: LoginCredentials) => {
     const response = await api.post<{
       access_token: string;
       token_type: string;
+      user_id: string;
     }>("/auth/login", credentials);
     return response.data;
   });
 };
 
-export const getTasks = async (): Promise<Task[]> => {
-  return handleApiCall(async () => {
-    const response = await api.get<Task[]>("/tasks/");
-    return response.data;
-  });
+export const getTasksByUser = async () => {
+  const userId = localStorage.getItem("user_id");
+  if (!userId) {
+    throw new Error("No se encontró el ID del usuario.");
+  }
+  const response = await api.get(`/tasks/user/${userId}`);
+  return response.data;
 };
 
 export const createTask = async (task: Omit<Task, "id">): Promise<Task> => {

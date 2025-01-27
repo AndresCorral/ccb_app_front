@@ -12,13 +12,12 @@ export const LoginForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Llama al servicio login con las credenciales del usuario
       const response = await login({ correo: email, password });
-      localStorage.setItem("token", response.access_token); // Guarda el token en localStorage
-      authLogin(response.access_token); // Actualiza el estado de autenticación en el contexto
+      localStorage.setItem("token", response.access_token); // Guarda el token
+      localStorage.setItem("user_id", response.user_id); // Guarda el user_id
+      authLogin(response.access_token); // Actualiza el estado de autenticación
       toast.success("¡Inicio de sesión exitoso!");
     } catch (error) {
-      // Muestra los errores personalizados lanzados por el servicio API
       toast.error(error instanceof Error ? error.message : "Error inesperado");
     }
   };
