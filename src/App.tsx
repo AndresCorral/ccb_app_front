@@ -27,7 +27,7 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route
-        path="auth/login"
+        path="/login"
         element={
           <PublicRoute>
             <LoginForm />

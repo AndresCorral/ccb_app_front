@@ -1,14 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import { toast } from 'react-hot-toast';
-import { PlusCircle, Edit2, Trash2, CheckCircle, XCircle, Clock } from 'lucide-react';
-import { getTasks, createTask, updateTask, updateTaskStatus, deleteTask } from '../services/api';
-import { Task } from '../types';
+import React, { useState, useEffect } from "react";
+import { toast } from "react-hot-toast";
+import {
+  PlusCircle,
+  Edit2,
+  Trash2,
+  CheckCircle,
+  XCircle,
+  Clock,
+} from "lucide-react";
+import {
+  getTasks,
+  createTask,
+  updateTask,
+  updateTaskStatus,
+  deleteTask,
+} from "../services/api";
+import { Task } from "../types";
 
 export const TaskList = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
-  const [newTask, setNewTask] = useState({ task_name: '', task_description: '' });
+  const [newTask, setNewTask] = useState({
+    task_name: "",
+    task_description: "",
+  });
 
   useEffect(() => {
     loadTasks();
@@ -18,8 +34,8 @@ export const TaskList = () => {
     try {
       const data = await getTasks();
       setTasks(data);
-    } catch (error) {
-      toast.error('Error al cargar las tareas');
+    } catch {
+      toast.error("Error al cargar las tareas");
     }
   };
 
@@ -28,15 +44,15 @@ export const TaskList = () => {
     try {
       await createTask({
         ...newTask,
-        task_status: 'Pendiente',
-        user_id: '123', // This should come from the authenticated user
+        task_status: "Pendiente",
+        user_id: "123", // This should come from the authenticated user
       });
-      setNewTask({ task_name: '', task_description: '' });
+      setNewTask({ task_name: "", task_description: "" });
       setIsAddingTask(false);
       loadTasks();
-      toast.success('Tarea creada exitosamente');
-    } catch (error) {
-      toast.error('Error al crear la tarea');
+      toast.success("Tarea creada exitosamente");
+    } catch {
+      toast.error("Error al crear la tarea");
     }
   };
 
@@ -48,41 +64,44 @@ export const TaskList = () => {
       await updateTask(editingTask.id, editingTask);
       setEditingTask(null);
       loadTasks();
-      toast.success('Tarea actualizada exitosamente');
-    } catch (error) {
-      toast.error('Error al actualizar la tarea');
+      toast.success("Tarea actualizada exitosamente");
+    } catch {
+      toast.error("Error al actualizar la tarea");
     }
   };
 
-  const handleStatusChange = async (taskId: string, newStatus: Task['task_status']) => {
+  const handleStatusChange = async (
+    taskId: string,
+    newStatus: Task["task_status"]
+  ) => {
     try {
       await updateTaskStatus(taskId, newStatus);
       loadTasks();
-      toast.success('Estado actualizado exitosamente');
-    } catch (error) {
-      toast.error('Error al actualizar el estado');
+      toast.success("Estado actualizado exitosamente");
+    } catch {
+      toast.error("Error al actualizar el estado");
     }
   };
 
   const handleDeleteTask = async (taskId: string) => {
-    if (!confirm('¿Estás seguro de que deseas eliminar esta tarea?')) return;
+    if (!confirm("¿Estás seguro de que deseas eliminar esta tarea?")) return;
 
     try {
       await deleteTask(taskId);
       loadTasks();
-      toast.success('Tarea eliminada exitosamente');
-    } catch (error) {
-      toast.error('Error al eliminar la tarea');
+      toast.success("Tarea eliminada exitosamente");
+    } catch {
+      toast.error("Error al eliminar la tarea");
     }
   };
 
-  const getStatusIcon = (status: Task['task_status']) => {
+  const getStatusIcon = (status: Task["task_status"]) => {
     switch (status) {
-      case 'Pendiente':
+      case "Pendiente":
         return <Clock className="h-5 w-5 text-yellow-500" />;
-      case 'Terminada':
+      case "Terminada":
         return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case 'Cancelada':
+      case "Cancelada":
         return <XCircle className="h-5 w-5 text-red-500" />;
     }
   };
@@ -101,23 +120,34 @@ export const TaskList = () => {
       </div>
 
       {isAddingTask && (
-        <form onSubmit={handleAddTask} className="mb-6 bg-white p-4 rounded-lg shadow">
+        <form
+          onSubmit={handleAddTask}
+          className="mb-6 bg-white p-4 rounded-lg shadow"
+        >
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Nombre</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Nombre
+              </label>
               <input
                 type="text"
                 value={newTask.task_name}
-                onChange={(e) => setNewTask({ ...newTask, task_name: e.target.value })}
+                onChange={(e) =>
+                  setNewTask({ ...newTask, task_name: e.target.value })
+                }
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Descripción</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Descripción
+              </label>
               <textarea
                 value={newTask.task_description}
-                onChange={(e) => setNewTask({ ...newTask, task_description: e.target.value })}
+                onChange={(e) =>
+                  setNewTask({ ...newTask, task_description: e.target.value })
+                }
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                 rows={3}
                 required
@@ -153,12 +183,17 @@ export const TaskList = () => {
               {editingTask?.id === task.id ? (
                 <form onSubmit={handleUpdateTask} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Nombre</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Nombre
+                    </label>
                     <input
                       type="text"
                       value={editingTask.task_name}
                       onChange={(e) =>
-                        setEditingTask({ ...editingTask, task_name: e.target.value })
+                        setEditingTask({
+                          ...editingTask,
+                          task_name: e.target.value,
+                        })
                       }
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                       required
@@ -171,7 +206,10 @@ export const TaskList = () => {
                     <textarea
                       value={editingTask.task_description}
                       onChange={(e) =>
-                        setEditingTask({ ...editingTask, task_description: e.target.value })
+                        setEditingTask({
+                          ...editingTask,
+                          task_description: e.target.value,
+                        })
                       }
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                       rows={3}
@@ -198,8 +236,12 @@ export const TaskList = () => {
                 <>
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="text-lg font-medium text-gray-900">{task.task_name}</h3>
-                      <p className="mt-1 text-gray-500">{task.task_description}</p>
+                      <h3 className="text-lg font-medium text-gray-900">
+                        {task.task_name}
+                      </h3>
+                      <p className="mt-1 text-gray-500">
+                        {task.task_description}
+                      </p>
                     </div>
                     <div className="flex items-center space-x-2">
                       <button
@@ -221,11 +263,11 @@ export const TaskList = () => {
                       {getStatusIcon(task.task_status)}
                       <span
                         className={`text-sm font-medium ${
-                          task.task_status === 'Pendiente'
-                            ? 'text-yellow-500'
-                            : task.task_status === 'Terminada'
-                            ? 'text-green-500'
-                            : 'text-red-500'
+                          task.task_status === "Pendiente"
+                            ? "text-yellow-500"
+                            : task.task_status === "Terminada"
+                            ? "text-green-500"
+                            : "text-red-500"
                         }`}
                       >
                         {task.task_status}
@@ -233,19 +275,19 @@ export const TaskList = () => {
                     </div>
                     <div className="flex space-x-2">
                       <button
-                        onClick={() => handleStatusChange(task.id, 'Pendiente')}
+                        onClick={() => handleStatusChange(task.id, "Pendiente")}
                         className="px-3 py-1 text-sm rounded-md border border-yellow-500 text-yellow-500 hover:bg-yellow-50"
                       >
                         Pendiente
                       </button>
                       <button
-                        onClick={() => handleStatusChange(task.id, 'Terminada')}
+                        onClick={() => handleStatusChange(task.id, "Terminada")}
                         className="px-3 py-1 text-sm rounded-md border border-green-500 text-green-500 hover:bg-green-50"
                       >
                         Terminada
                       </button>
                       <button
-                        onClick={() => handleStatusChange(task.id, 'Cancelada')}
+                        onClick={() => handleStatusChange(task.id, "Cancelada")}
                         className="px-3 py-1 text-sm rounded-md border border-red-500 text-red-500 hover:bg-red-50"
                       >
                         Cancelada
