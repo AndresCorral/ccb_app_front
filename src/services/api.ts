@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { LoginCredentials, Task } from "../types";
 
 const API_URL = "https://ccbtodoapp-production.up.railway.app";
@@ -9,10 +9,10 @@ const api = axios.create({
     "Content-Type": "application/json",
     Accept: "application/json",
   },
-  withCredentials: true,
+  withCredentials: false, // Cambia a true solo si necesitas enviar cookies
 });
 
-// Add token to requests if it exists
+// Interceptor para incluir el token en cada solicitud
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
@@ -21,52 +21,100 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-export const login = async (credentials: LoginCredentials) => {
-  try {
-    const response = await api.post("/auth/login", credentials);
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // Maneja errores específicos de la API
-      if (error.response?.status === 401) {
-        throw new Error("Credenciales incorrectas");
+// Interceptor para manejar errores globalmente
+api.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError) => {
+    if (error.response) {
+      const { status } = error.response;
+
+      if (status === 401) {
+        console.error("No autorizado. Verifica tu sesión.");
+        throw new Error("No autorizado. Por favor, inicia sesión.");
       }
-      if (error.response?.status === 422) {
-        throw new Error("Datos de entrada inválidos");
+
+      if (status === 422) {
+        console.error("Entrada inválida.");
+        throw new Error("Entrada inválida. Revisa los datos proporcionados.");
       }
-      // Maneja errores de red
-      if (error.code === "ERR_NETWORK") {
-        throw new Error("Error de conexión con el servidor");
+
+      if (status >= 500) {
+        console.error("Error del servidor.");
+        throw new Error("Error interno del servidor. Intenta más tarde.");
       }
     }
-    // Lanza el error original si no es un error de Axios
+
+    if (error.code === "ERR_NETWORK") {
+      console.error("Error de red.");
+      throw new Error("No se pudo conectar con el servidor.");
+    }
+
     throw error;
+  }
+);
+
+// Función auxiliar para manejar solicitudes
+const handleApiCall = async <T>(callback: () => Promise<T>): Promise<T> => {
+  try {
+    return await callback();
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+      throw error;
+    }
+    throw new Error("Error desconocido.");
   }
 };
 
-export const getTasks = async () => {
-  const response = await api.get("/tasks/");
-  return response.data;
+// Endpoints
+export const login = async (credentials: LoginCredentials) => {
+  return handleApiCall(async () => {
+    const response = await api.post<{
+      access_token: string;
+      token_type: string;
+    }>("/auth/login", credentials);
+    return response.data;
+  });
 };
 
-export const createTask = async (task: Omit<Task, "id">) => {
-  const response = await api.post("/tasks/", task);
-  return response.data;
+export const getTasks = async (): Promise<Task[]> => {
+  return handleApiCall(async () => {
+    const response = await api.get<Task[]>("/tasks/");
+    return response.data;
+  });
 };
 
-export const updateTask = async (id: string, task: Partial<Task>) => {
-  const response = await api.put(`/tasks/${id}`, task);
-  return response.data;
+export const createTask = async (task: Omit<Task, "id">): Promise<Task> => {
+  return handleApiCall(async () => {
+    const response = await api.post<Task>("/tasks/", task);
+    return response.data;
+  });
+};
+
+export const updateTask = async (
+  id: string,
+  task: Partial<Task>
+): Promise<Task> => {
+  return handleApiCall(async () => {
+    const response = await api.put<Task>(`/tasks/${id}`, task);
+    return response.data;
+  });
 };
 
 export const updateTaskStatus = async (
   id: string,
   status: Task["task_status"]
-) => {
-  const response = await api.patch(`/tasks/${id}`, { task_status: status });
-  return response.data;
+): Promise<Task> => {
+  return handleApiCall(async () => {
+    const response = await api.patch<Task>(`/tasks/${id}/status`, {
+      task_status: status,
+    });
+    return response.data;
+  });
 };
 
-export const deleteTask = async (id: string) => {
-  await api.delete(`/tasks/${id}`);
+export const deleteTask = async (id: string): Promise<void> => {
+  return handleApiCall(async () => {
+    await api.delete(`/tasks/${id}`);
+  });
 };
