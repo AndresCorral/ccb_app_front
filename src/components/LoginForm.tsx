@@ -1,22 +1,23 @@
-import React, { useState } from 'react';
-import { toast } from 'react-hot-toast';
-import { LogIn } from 'lucide-react';
-import { login } from '../services/api';
-import { useAuth } from '../context/AuthContext';
+import React, { useState } from "react";
+import { toast } from "react-hot-toast";
+import { LogIn } from "lucide-react";
+import { login } from "../services/api";
+import { useAuth } from "../context/AuthContext";
 
 export const LoginForm = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const { login: authLogin } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const response = await login({ correo: email, password });
-      authLogin(response.token);
-      toast.success('¡Inicio de sesión exitoso!');
-    } catch (error) {
-      toast.error('Credenciales inválidas');
+      localStorage.setItem("token", response.token); // Almacena el token en localStorage
+      authLogin(response.token); // Actualiza el estado de autenticación en el contexto
+      toast.success("¡Inicio de sesión exitoso!");
+    } catch {
+      toast.error("Credenciales inválidas");
     }
   };
 
@@ -35,7 +36,10 @@ export const LoginForm = () => {
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Correo electrónico
               </label>
               <div className="mt-1">
@@ -52,7 +56,10 @@ export const LoginForm = () => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Contraseña
               </label>
               <div className="mt-1">
