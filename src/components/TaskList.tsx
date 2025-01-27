@@ -9,7 +9,7 @@ import {
   Clock,
 } from "lucide-react";
 import {
-  getTasks,
+  getTasksByUser,
   createTask,
   updateTask,
   updateTaskStatus,
@@ -32,7 +32,7 @@ export const TaskList = () => {
 
   const loadTasks = async () => {
     try {
-      const data = await getTasks();
+      const data = await getTasksByUser();
       setTasks(data);
     } catch {
       toast.error("Error al cargar las tareas");
