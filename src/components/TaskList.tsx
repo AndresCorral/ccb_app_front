@@ -20,8 +20,9 @@ export const TaskList = () => {
     task_name: "",
     task_description: "",
     task_status: "Pendiente", // Valor predeterminado
-    user_id: localStorage.getItem("userId") || "", // Obtiene user_id desde localStorage
+    user_id: localStorage.getItem("user_id") || "", // Obtiene user_id desde localStorage
   });
+  console.log(">>>", localStorage.getItem("user_id"));
 
   // Cargar tareas al inicializar
   useEffect(() => {
