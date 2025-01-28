@@ -54,9 +54,10 @@ export const TaskList = () => {
       setNewTask({
         task_name: "",
         task_description: "",
-        task_status: "Pendiente", // Valor predeterminado
+        task_status: "Pendiente",
         user_id: localStorage.getItem("user_id") || "",
       });
+      console.log(localStorage.getItem("user_id"));
       setIsAddingTask(false);
       loadTasks();
       toast.success("Tarea creada exitosamente");
