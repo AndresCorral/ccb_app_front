@@ -55,7 +55,7 @@ export const TaskList = () => {
         task_name: "",
         task_description: "",
         task_status: "Pendiente", // Valor predeterminado
-        user_id: localStorage.getItem("userId") || "",
+        user_id: localStorage.getItem("user_id") || "",
       });
       setIsAddingTask(false);
       loadTasks();
