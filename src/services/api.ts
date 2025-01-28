@@ -99,7 +99,7 @@ export const updateTask = async (
   task: Partial<Task>
 ): Promise<Task> => {
   return handleApiCall(async () => {
-    const response = await api.put<Task>(`/tasks/${id}`, task);
+    const response = await api.patch<Task>(`/tasks/${id}`, task);
     return response.data;
   });
 };
