@@ -50,6 +50,7 @@ export const TaskList = () => {
     }
 
     try {
+      console.log(localStorage.getItem("user_id"));
       await createTask(newTask); // Crear tarea
       setNewTask({
         task_name: "",
@@ -57,7 +58,6 @@ export const TaskList = () => {
         task_status: "Pendiente",
         user_id: localStorage.getItem("user_id") || "",
       });
-      console.log(localStorage.getItem("user_id"));
       setIsAddingTask(false);
       loadTasks();
       toast.success("Tarea creada exitosamente");
